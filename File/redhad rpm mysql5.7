@@ -1,0 +1,84 @@
+删除旧包：
+
+查询mysql包 删除
+# rpm -qa | grep -i mysql
+# rpm -ev mysql-libs-* --nodeps
+
+安装rpm包：
+
+# rpm -ivh mysql-community-common-5.7.17-1.el7.x86_64.rpm
+# rpm -ivh mysql-community-libs-5.7.17-1.el7.x86_64.rpm
+# rpm -ivh mysql-community-client-5.7.17-1.el7.x86_64.rpm
+# rpm -ivh mysql-community-server-5.7.17-1.el7.x86_64.rpm
+
+
+启动、停止：
+
+# service mysqld start
+# service mysqld stop
+# service mysqld status
+
+初始随机密码：
+
+# cat /var/log/mysqld.log | more
+找到 A temporary password is generated for root@localhost: 随机密码
+修改初始密码及授权远程访问：
+
+# mysql -uroot -p
+mysql> set password='Pwd@123456';
+mysql> grant all privileges on *.* to 'root'@'%' identified by 'Pwd@123456';
+
+密码复杂度属性：
+
+mysql> set global validate_password_policy=0;
+validate_password_policy有以下取值：（默认是1，即MEDIUM，所以刚开始设置的密码必须符合长度，且必须含有数字，小写或大写字母，特殊字符。）
+
+
+------------------------------------------------------------------------------数据库配置
+开放3306 端口
+1、打开防火墙配置文件
+vi  /etc/sysconfig/iptables
+2、增加下面一
+-A INPUT -m state --state NEW -m tcp -p tcp --dport 3306 -j ACCEPT
+3、保存后重启防火墙
+service  iptables restart  （操作系统高得话这个命令不适合就用）
+systemctl restart iptables
+
+忽略数据库大小写
+打开Mysql的 my.cnf 配置文件，默认是在 /etc/my.cnf
+vim /etc/my.cnf
+添加以下配置
+[mysqld]
+lower_case_table_names=1
+重启服务
+Centos7
+systemctl restart mysql/mariadb
+Ubuntu
+service mysql/mariadb restart
+
+导入数据.sql
+mysql -u用户名 -p密码
+
+查看数据库
+show databases
+如果没有导入的数据库
+create database 库名; 逗号要加
+进入数据库
+use 库名;
+-------------下面执行步骤都要进入对应的数据库
+导入数据库脚本
+source 绝对位置/xx.sql
+导出数据库(包含数据)
+mysqldump -u用户名 -p数据库名>导出文件名
+导出数据库表(包含数据)
+mysqldump -u用户名 -p数据库名.表名>导出文件名
+导出数据库结构(不包含数据)
+mysqldump -u 用户名 -p -d --add-drop-table smgp_apps_wcnc >d:wcnc_db.sql
+-d 没有数据 --add-drop-table 在每个create语句之前增加一个drop table
+
+
+
+
+
+
+
